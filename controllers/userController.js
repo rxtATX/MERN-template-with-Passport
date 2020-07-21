@@ -1,8 +1,9 @@
 const db = require("../models");
+
 // Defining methods for the userController
 module.exports = {
     findAll: function (req, res) {
-        db.User.find({})
+        db.User.findAll({})
             .then(dbData => {
                 res.json(dbData)
             })
@@ -19,7 +20,7 @@ module.exports = {
             // Sending back a password, even a hashed password, isn't a good idea
             res.json({
                 email: req.user.email,
-                id: req.user._id
+                id: req.user.id
             });
         }
     },
@@ -30,15 +31,14 @@ module.exports = {
         });
     },
     create: function (req, res) {
-        const user = new db.User(req.body);
-        user.encryptPassword();
-
-        db.User.create(user)
+        db.User.create({
+            email: req.body.email,
+            password: req.body.password
+        })
             .then(() => {
                 res.redirect(307, "/api/user/login");
             })
             .catch(err => {
-                console.log(err)
                 res.status(401).json(err);
             });
     },
